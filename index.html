@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -115,7 +116,6 @@
     background: var(--welcome-bg);
     padding: 15px 0;
     margin-bottom: 20px;
-    border-radius: 5px;
   }
   .moving-text {
     font-size: 1.5em;
@@ -227,6 +227,10 @@
     font-weight: bold;
     color: var(--header-bg);
   }
+  /* Resource section styling */
+  #resources {
+    display: none;
+  }
   /* Responsive */
   @media(max-width:768px){
     nav {
@@ -240,6 +244,31 @@
     .theme-toggle {
       top: 100px;
     }
+  }
+  /* Buttons styling inside resources */
+  .category-buttons, .level-buttons, #classButtonsContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  button {
+    padding: 8px 12px;
+    border: none;
+    background-color: #0066cc;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  button.active, button:hover {
+    background-color: #005999;
+  }
+  /* Resource cards */
+  .resource-card {
+    border: 1px solid #ccc;
+    padding: 8px;
+    margin-bottom: 8px;
+    border-radius: 5px;
   }
 </style>
 </head>
@@ -265,14 +294,14 @@
 
 <!-- Navigation -->
 <nav>
-  <a href="#home">Home</a>
-  <a href="#about">About Us</a>
-  <a href="#admissions">Admissions</a>
-  <a href="#department">Departments</a>
-  <a href="#gallery">Gallery</a>
-  <a href="#news-events">News & Events</a>
-  <a href="#contact">Contact Us</a>
-  <a href="#resources" id="resourcesLink">Resources</a>
+  <a href="#home" class="nav-link">Home</a>
+  <a href="#about" class="nav-link">About Us</a>
+  <a href="#admissions" class="nav-link">Admissions</a>
+  <a href="#department" class="nav-link">Departments</a>
+  <a href="#gallery" class="nav-link">Gallery</a>
+  <a href="#news-events" class="nav-link">News & Events</a>
+  <a href="#contact" class="nav-link">Contact Us</a>
+  <a href="#resources" id="resourcesLink" class="nav-link">Resources</a>
 </nav>
 
 <!-- Moving message -->
@@ -286,22 +315,22 @@
   <p>We are honored to welcome you to Groupe Scolaire Gasagara, a premier educational institution committed to academic excellence and holistic development of students in Rwanda.</p>
 </section>
 
-<section id="about">
+<section id="about" style="display:none;">
   <h2>About Us</h2>
   <p>Founded in 2017, Groupe Scolaire Gasagara has established itself as a center of academic excellence in the Huye-Gikonko region.</p>
 </section>
 
-<section id="admissions">
+<section id="admissions" style="display:none;">
   <h2>Admissions</h2>
   <p>We welcome students who are eager to learn and grow in our supportive educational environment.</p>
 </section>
 
-<section id="department">
+<section id="department" style="display:none;">
   <h2>Departments</h2>
   <p>Our school offers comprehensive programs across various departments.</p>
 </section>
 
-<section id="gallery">
+<section id="gallery" style="display:none;">
   <h2>Gallery</h2>
   <div class="gallery-placeholder">
     <div class="gallery-item">School Building</div>
@@ -311,7 +340,7 @@
   </div>
 </section>
 
-<section id="news-events">
+<section id="news-events" style="display:none;">
   <h2>News & Events</h2>
   <div class="news-item">
     <p class="news-date">March 15, 2025</p>
@@ -319,7 +348,7 @@
   </div>
 </section>
 
-<section id="contact">
+<section id="contact" style="display:none;">
   <h2>Contact Us</h2>
   <div class="contact-info">
     <p><strong>Address:</strong> Huye-Gikonko, Gisagara, Rwanda</p>
@@ -329,17 +358,29 @@
 </section>
 
 <!-- Resources Section -->
-<section id="resources" style="display:none;">
+<section id="resources">
   <h2>Resources</h2>
-  <!-- Resource Tabs -->
-  <div style="display:flex; gap:10px; margin-bottom:15px;">
+  <!-- Category Tabs -->
+  <div class="category-buttons" style="margin-bottom:15px;">
     <button data-section="books" class="active">📚 Books</button>
     <button data-section="media">🎬 Video & Audio</button>
     <button data-section="schem">🗂️ Schem of work</button>
     <button data-section="lesson">📝 Lesson Plan</button>
   </div>
-  <!-- Resource Content -->
-  <div id="resourceContent"></div>
+  <!-- Level Selection -->
+  <div class="level-buttons" style="margin-bottom:15px;">
+    <strong>Select Level:</strong>
+    <button data-level="pre-primary" class="active">Pre-Primary</button>
+    <button data-level="lower-primary">Lower Primary</button>
+    <button data-level="upper-primary">Upper Primary</button>
+    <button data-level="secondary">Secondary</button>
+  </div>
+  <!-- Class Buttons -->
+  <div id="classButtonsContainer" style="margin-bottom:15px; display:flex; flex-wrap:wrap; gap:10px;"></div>
+  <!-- Resources Display -->
+  <div id="resourceDisplay" style="min-height:100px; background:#f0f0f0; padding:10px; border-radius:5px;">
+    <p>Select a class to view resources.</p>
+  </div>
 </section>
 
 <!-- Footer -->
@@ -356,6 +397,8 @@
     const rwanda=new Date(now.getTime()+2*60*60*1000);
     document.getElementById('rwanda-time').textContent=`${pad(rwanda.getUTCHours())}:${pad(rwanda.getUTCMinutes())}:${pad(rwanda.getUTCSeconds())}`;
   }
+  setInterval(updateClocks,1000);
+
   // Vibrate on every 10 min
   function checkVibrate() {
     const now=new Date();
@@ -364,8 +407,7 @@
       setTimeout(()=>{document.querySelectorAll('.clock').forEach(c=>c.classList.remove('vibrate'));},5000);
     }
   }
-  setInterval(updateClocks,1000);
-  setInterval(()=>{checkVibrate();},1000);
+  setInterval(checkVibrate,1000);
 
   // Theme toggle
   const themeBtn=document.getElementById('themeToggle');
@@ -386,115 +428,140 @@
   };
 
   // Navigation
-  const navLinks=document.querySelectorAll('nav a');
+  const navLinks=document.querySelectorAll('.nav-link');
   const sections=document.querySelectorAll('section');
   navLinks.forEach(link=>{
     link.onclick=(e)=>{
       e.preventDefault();
       const targetId=link.getAttribute('href').substring(1);
-      sections.forEach(s=>{s.style.display='none';});
+      sections.forEach(s=>s.style.display='none');
       document.getElementById(targetId).style.display='block';
-      if(targetId!=='resources'){
-        document.getElementById('resources').style.display='none';
-      }
     };
   });
 
-  // Resources data
-const RESOURCE_DATA={
-  "books":{
-    "pre-primary":{N1:[],N2:[],N3:[]},
-    "lower-primary":{P1:[],P2:[],P3:[]},
-    "upper-primary":{P4:[],P5:[],P6:[]},
-    "secondary":{S1:[],S2:[],S3:[]}
-  },
-  "media":{
-    "pre-primary":{N1:[],N2:[],N3:[]},
-    "lower-primary":{P1:[],P2:[],P3:[]},
-    "upper-primary":{P4:[],P5:[],P6:[]},
-    "secondary":{S1:[],S2:[],S3:[]}
-  },
-  "schem":{
-    "pre-primary":{N1:[],N2:[],N3:[]},
-    "lower-primary":{P1:[],P2:[],P3:[]},
-    "upper-primary":{P4:[],P5:[],P6:[]},
-    "secondary":{S1:[],S2:[],S3:[]}
-  },
-  "lesson":{
-    "pre-primary":{N1:[],N2:[],N3:[]},
-    "lower-primary":{P1:[],P2:[],P3:[]},
-    "upper-primary":{P4:[],P5:[],P6:[]},
-    "secondary":{S1:[],S2:[],S3:[]}
+  // Resource Data
+  const RESOURCE_DATA={
+    "books":{
+      "pre-primary": {N1:[],N2:[],N3:[]},
+      "lower-primary": {P1:[],P2:[],P3:[]},
+      "upper-primary": {P4:[],P5:[],P6:[]},
+      "secondary": {S1:[],S2:[],S3:[]}
+    },
+    "media":{
+      "pre-primary": {N1:[],N2:[],N3:[]},
+      "lower-primary": {P1:[],P2:[],P3:[]},
+      "upper-primary": {P4:[],P5:[],P6:[]},
+      "secondary": {S1:[],S2:[],S3:[]}
+    },
+    "schem":{
+      "pre-primary": {N1:[],N2:[],N3:[]},
+      "lower-primary": {P1:[],P2:[],P3:[]},
+      "upper-primary": {P4:[],P5:[],P6:[]},
+      "secondary": {S1:[],S2:[],S3:[]}
+    },
+    "lesson":{
+      "pre-primary": {N1:[],N2:[],N3:[]},
+      "lower-primary": {P1:[],P2:[],P3:[]},
+      "upper-primary": {P4:[],P5:[],P6:[]},
+      "secondary": {S1:[],S2:[],S3:[]}
+    }
+  };
+
+  // Sample resource
+  RESOURCE_DATA.books.secondary.S3.push({
+    title:'ICT',
+    type:'Book',
+    subject:'ICT',
+    category:"Student's Book",
+    url:'https://elearning.reb.rw/pluginfile.php/11698/mod_resource/content/1/ICT%20%20S3%20SB.pdf'
+  });
+
+  // Current selections
+  let currentCategory='books';
+  let currentLevel='pre-primary';
+  let currentClass=Object.keys(RESOURCE_DATA[currentCategory][currentLevel])[0];
+
+  // Elements
+  const categoryButtons=document.querySelectorAll('.category-buttons button');
+  const levelButtons=document.querySelectorAll('.level-buttons button');
+  const classButtonsContainer=document.getElementById('classButtonsContainer');
+  const resourceDisplay=document.getElementById('resourceDisplay');
+
+  // Functions to render class buttons
+  function renderClassButtons() {
+    classButtonsContainer.innerHTML='';
+    const classes=Object.keys(RESOURCE_DATA[currentCategory][currentLevel]);
+    classes.forEach(c => {
+      const btn=document.createElement('button');
+      btn.textContent=c;
+      if(c===currentClass) btn.classList.add('active');
+      btn.onclick=()=>{
+        currentClass=c;
+        updateActiveClassButtons();
+        displayResources();
+      };
+      classButtonsContainer.appendChild(btn);
+    });
   }
-};
-// Example resource
-RESOURCE_DATA.books.secondary.S3.push({
-  title:'ICT',
-  type:'Book',
-  subject:'ICT',
-  category:"Student's Book",
-  url:'https://elearning.reb.rw/pluginfile.php/11698/mod_resource/content/1/ICT%20%20S3%20SB.pdf'
-});
 
-// State variables
-let currentSection='home', currentLevel='pre-primary', currentClass='N1';
+  function updateActiveClassButtons() {
+    document.querySelectorAll('#classButtonsContainer button').forEach(b => {
+      b.classList.toggle('active', b.textContent===currentClass);
+    });
+  }
 
-// Resource tab handling
-const resourceButtons=document.querySelectorAll('[data-section]');
-const resourceContentDiv=document.getElementById('resourceContent');
-
-function renderResourceContent(section,level,cls){
-  resourceContentDiv.innerHTML='';
-  const resources=RESOURCE_DATA[section][level][cls];
-  if(resources.length===0){
-    resourceContentDiv.innerHTML='<p>No resources available for this class.</p>';
-  } else {
-    resources.forEach(r=>{
-      resourceContentDiv.innerHTML+=`
-        <div class="card resource">
+  // Display resources
+  function displayResources() {
+    const resources=RESOURCE_DATA[currentCategory][currentLevel][currentClass];
+    resourceDisplay.innerHTML='';
+    if(resources.length===0){
+      resourceDisplay.innerHTML='<p>No resources available for this class.</p>';
+    } else {
+      resources.forEach(r => {
+        const card=document.createElement('div');
+        card.className='resource-card';
+        card.innerHTML=`
           <strong>${r.title}</strong> (${r.category})<br/>
           Subject: ${r.subject}<br/>
           <a href="${r.url}" target="_blank">Open Resource</a>
-        </div>`;
-    });
+        `;
+        resourceDisplay.appendChild(card);
+      });
+    }
   }
-}
 
-// Initialize resources view
-function showResources(){
-  document.querySelectorAll('section').forEach(s=>s.style.display='none');
-  document.getElementById('resources').style.display='block';
-}
+  // Category buttons event
+  document.querySelectorAll('.category-buttons button').forEach(btn => {
+    btn.onclick=()=>{
+      document.querySelectorAll('.category-buttons button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      currentCategory=btn.dataset.section;
+      // Reset level and class
+      currentLevel='pre-primary';
+      document.querySelector('.level-buttons button[data-level="pre-primary"]').classList.add('active');
+      document.querySelector('.level-buttons button[data-level="pre-primary"]').classList.remove('active');
+      renderLevelButtons();
+      renderClassButtons();
+      displayResources();
+    };
+  });
 
-// Resource tab click
-resourceButtons.forEach(btn=>{
-  btn.onclick=()=>{
-    // Remove active from all
-    resourceButtons.forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    const section=btn.dataset.section;
-    // For simplicity, default to first level and class
-    currentSection=section;
-    currentLevel='pre-primary';
-    currentClass=Object.keys(RESOURCE_DATA[section][currentLevel])[0];
-    renderResourceContent(section,currentLevel,currentClass);
-  };
-});
-// Show resources on clicking Resources link
-document.getElementById('resourcesLink').onclick=e=>{
-  e.preventDefault();
-  showResources();
-  // Activate default tab
-  const firstBtn=document.querySelector('[data-section="'+currentSection+'"]');
-  if(firstBtn) firstBtn.click();
-}
+  // Level buttons event
+  document.querySelectorAll('.level-buttons button').forEach(btn => {
+    btn.onclick=()=>{
+      document.querySelectorAll('.level-buttons button').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      currentLevel=btn.dataset.level;
+      // Reset class to first
+      currentClass=Object.keys(RESOURCE_DATA[currentCategory][currentLevel])[0];
+      renderClassButtons();
+      displayResources();
+    };
+  });
 
-// -- Class and Level selection inside resources could be added here as needed --
-
-// Initial display
-document.querySelector('section#home').style.display='block';
+  // Initialize default view
+  document.querySelector('.category-buttons button[data-section="books"]').click();
 
 </script>
-
 </body>
 </html>
